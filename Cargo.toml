@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+	"rinit",
+	"rservice",
+	"ex_service",
+]

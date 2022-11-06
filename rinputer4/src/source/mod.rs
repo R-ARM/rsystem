@@ -14,7 +14,6 @@ use anyhow::Result;
 
 mod quirks_db;
 pub mod event;
-pub mod remote;
 
 #[derive(Debug, Copy, Clone)]
 pub enum SourceCaps {

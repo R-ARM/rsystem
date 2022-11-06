@@ -19,7 +19,6 @@ use anyhow::Result;
 
 use crate::{
     sink::{Sink, uinput::UinputSink},
-    source::remote::Remote,
     source::OpenedEventSource,
 };
 
@@ -42,12 +41,6 @@ fn handle_client(mut stream: TcpStream, all_sinks_mutex: Arc<Mutex<Vec<Box<dyn S
         let args: Vec<&str> = buf.trim().split(' ').collect();
 
         match args[0] {
-            "add_3ds" => {
-                let mut all_sinks = all_sinks_mutex.lock().unwrap();
-                let new = Remote::new("192.168.88.120:2137").unwrap();
-                all_sinks.push(UinputSink::new(source::into_opened(Box::new(new)))?);
-                stream.write_all(b"OK\n");
-            },
             "add_sink" => {
                 let snk_type = args[1].parse::<usize>()?;
                 let mut all_sinks = all_sinks_mutex.lock().unwrap();

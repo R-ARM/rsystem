@@ -9,25 +9,16 @@ use std::{
 };
 
 pub struct ServiceClient {
-    methods: HashSet<String>,
     stream: UnixStream,
 }
 
 impl ServiceClient {
     fn from_socket(mut input: UnixStream) -> Option<Self> {
-        let mut methods_string = String::new();
-        input.read_to_string(&mut methods_string).ok()?;
-        
         Some(Self {
             stream: input,
-            methods: methods_string.split(':').map(|v| v.to_string()).collect(),
         })
     }
     pub fn call(&mut self, method: impl ToString, args: impl IntoIterator<Item = impl ToString>) -> Option<String> {
-        if !self.methods.contains(&method.to_string()) {
-            return None;
-        }
-
         let mut tmp: Vec<String> = Vec::new();
         tmp.push(method.to_string());
         tmp.extend(args.into_iter().map(|v| v.to_string()));
@@ -35,13 +26,14 @@ impl ServiceClient {
             .map(|v| format!("{}:", v))
             .collect();
         full_call.pop();
+        full_call.push('\n');
 
         self.stream.write_all(full_call.as_str().as_bytes()).ok()?;
 
-        let mut ret = String::new();
-        self.stream.read_to_string(&mut ret).ok()?;
+        let mut buf = Vec::new();
+        self.stream.read_to_end(&mut buf).ok()?;
         
-        Some(ret)
+        Some(String::from_utf8_lossy(&buf).trim().to_string())
     }
 }
 

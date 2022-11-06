@@ -1,4 +1,4 @@
-use rservice::server::ServiceServer;
+use rservice::server::{srv_fn, ServiceServer};
 use std::sync::{Arc, Mutex};
 
 fn append_hello(_: Arc<Mutex<Box<()>>>, mut args: Vec<String>) -> String {
@@ -9,10 +9,15 @@ fn append_hello(_: Arc<Mutex<Box<()>>>, mut args: Vec<String>) -> String {
     }
 }
 
+fn ping(_: Arc<Mutex<Box<()>>>, _: Vec<String>) -> String {
+    "pong".to_string()
+}
+
 fn main() {
     let srv = ServiceServer::new("example",
         [
-            ("append_hello", append_hello as fn(Arc<Mutex<Box<_>>>, Vec<_>) -> String),
+            srv_fn!(append_hello),
+            srv_fn!(ping),
         ], ()).expect("Failed to register service");
     srv.run();
 }

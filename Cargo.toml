@@ -5,4 +5,5 @@ members = [
 	"rservice",
 	"ex_service",
 	"ex_client",
+	"rinputer4",
 ]

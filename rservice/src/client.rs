@@ -40,7 +40,17 @@ impl ServiceClient {
 pub fn get_service(name: &str) -> Option<ServiceClient> {
     let path: PathBuf = ["/srv/", name].iter().collect();
     if !path.exists() {
-        return None;
+        if name == "init" {
+            return None;
+        }
+
+        let mut init = get_service("init")?;
+        if init.call("launch_service", [name])? == "ERR" {
+            return None;
+        };
+        std::thread::sleep(std::time::Duration::from_millis(100));
+
+        return get_service(name);
     }
     
     let socket = match UnixStream::connect(path) {

@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 ozone = { git = "https://github.com/Maccraft123/ozone.git", branch = "main" }
+rservice = { path = "../rservice" }
